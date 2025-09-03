@@ -96,6 +96,30 @@ def get_plot_df(df2: pd.DataFrame, facet_col: str = None):
 
     temp_df = df2[(df2['percent_cost'] <= 100) & (df2['percent_cost'] >= 0)].copy()
 
+    if facet_col == 'total_cost':
+        max_cost = temp_df['total_price'].max()
+        min_cost = temp_df['total_price'].min()
+        interval = round((max_cost - min_cost) / 5)
+        bin_maxs = [min_cost + i * interval for i in range(1,6)]
+        temp_df['cost_bin'] = None
+
+        for i in range(4):
+            if i == 0:
+                lo = 0
+                hi = bin_maxs[0]
+            else:
+                lo = bin_maxs[i]
+                hi = bin_maxs[i+1]
+
+            for j, row in temp_df.iterrows():
+                row_cost = row['total_price']
+                row_bin = row['cost_bin']
+                if not row_bin:
+                    if row_cost <= hi & row_cost > lo:
+                        temp_df.loc[j, 'cost_bin'] = f'${lo}-${hi}'
+
+        facet_col = 'cost_bin'
+
     if facet_col:
         temp_df['median'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform('median')
         temp_df['q1'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform(find_first_quartile)
@@ -124,9 +148,8 @@ def produce_plot2(chosen_year: int, facet_name: str):
 
     facet_dict = {
         'None': None,
-        'State': 'state',
+        'Region': 'region',
         'Type': 'type',
-        'Campus': 'campus',
         'Total Cost': 'total_cost'
     }
 
@@ -136,15 +159,15 @@ def produce_plot2(chosen_year: int, facet_name: str):
     if facet_col:
         fig = px.bar(
             plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
-            labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level", "state": "State",
-                    "type": "Type", "campus": "Campus", "total_cost": "Total Cost"},
+            labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level",
+                    "type": "Type", "total_cost": "Total Cost"},
             facet_row=facet_col
         )
     else:
         fig = px.bar(
             plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
-            labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level", "state": "State",
-                    "type": "Type", "campus": "Campus", "total_cost": "Total Cost"}
+            labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level",
+                    "type": "Type", "total_cost": "Total Cost"}
         )
 
     return fig
@@ -159,7 +182,7 @@ add_year_slider = st.sidebar.slider(
 )
 
 add_facet_selectbox = st.sidebar.selectbox(
-    'Group By:', ('None', 'State', 'Type', 'Campus', 'Total Cost')
+    'Group By:', ('None', 'Region', 'Type', 'Total Cost')
 )
 
 # add_y_checkbox = st.sidebar.selectbox(
