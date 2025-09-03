@@ -97,27 +97,27 @@ def get_plot_df(df2: pd.DataFrame, facet_col: str = None):
 
     temp_df = df2[(df2['percent_cost'] <= 100) & (df2['percent_cost'] >= 0)].copy()
 
-    if facet_col == 'cost_bin':
-        max_cost = temp_df['total_price'].max()
-        min_cost = temp_df['total_price'].min()
-        interval = round((max_cost - min_cost) / 3)
-        bin_maxs = [(min_cost + (i * interval)) for i in range(1,4)]
-        temp_df['cost_bin'] = None
+    # if facet_col == 'cost_bin':
+    #     max_cost = temp_df['total_price'].max()
+    #     min_cost = temp_df['total_price'].min()
+    #     interval = round((max_cost - min_cost) / 3)
+    #     bin_maxs = [(min_cost + (i * interval)) for i in range(1,4)]
+    #     temp_df['cost_bin'] = None
 
-        for j, row in temp_df.iterrows():
-            row_cost = row['total_price']
-            row_bin = row['cost_bin']
-            if not row_bin:
-                for i in range(3):
-                    lo_idx = i - 1
-                    hi_idx = i
-                    if lo_idx < 0:
-                        lo = 0
-                    else:
-                        lo=bin_maxs[lo_idx]
-                    hi = bin_maxs[hi_idx]
-                    if row_cost <= hi & row_cost > lo:
-                        temp_df.loc[j, 'cost_bin'] = f'${lo}-${hi}'
+    #     for j, row in temp_df.iterrows():
+    #         row_cost = row['total_price']
+    #         row_bin = row['cost_bin']
+    #         if not row_bin:
+    #             for i in range(3):
+    #                 lo_idx = i - 1
+    #                 hi_idx = i
+    #                 if lo_idx < 0:
+    #                     lo = 0
+    #                 else:
+    #                     lo=bin_maxs[lo_idx]
+    #                 hi = bin_maxs[hi_idx]
+    #                 if row_cost <= hi & row_cost > lo:
+    #                     temp_df.loc[j, 'cost_bin'] = f'${lo}-${hi}'
 
     if facet_col:
         temp_df['median'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform('median')
@@ -148,8 +148,8 @@ def produce_plot2(chosen_year: int, facet_name: str):
     facet_dict = {
         'None': None,
         'Region': 'region',
-        'Type': 'type',
-        'Total Cost': 'cost_bin'
+        'Type': 'type'
+        # 'Total Cost': 'cost_bin'
     }
 
     facet_col = facet_dict[facet_name]
@@ -159,14 +159,14 @@ def produce_plot2(chosen_year: int, facet_name: str):
         fig = px.bar(
             plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
             labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level",
-                    "type": "Type", "cost_bin": "Total Cost", "region": "Region"},
+                    "type": "Type", "region": "Region"},
             facet_row=facet_col
         )
     else:
         fig = px.bar(
             plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
             labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level",
-                    "type": "Type", "cost_bin": "Total Cost", "region": "Region"}
+                    "type": "Type", "region": "Region"}
         )
 
     return fig
@@ -181,7 +181,7 @@ add_year_slider = st.sidebar.slider(
 )
 
 add_facet_selectbox = st.sidebar.selectbox(
-    'Group By:', ('None', 'Region', 'Type', 'Total Cost')
+    'Group By:', ('None', 'Region', 'Type')
 )
 
 # add_y_checkbox = st.sidebar.selectbox(
