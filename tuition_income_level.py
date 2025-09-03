@@ -100,15 +100,15 @@ def get_plot_df(df2: pd.DataFrame, facet_col: str = None):
     if facet_col == 'cost_bin':
         max_cost = temp_df['total_price'].max()
         min_cost = temp_df['total_price'].min()
-        interval = round((max_cost - min_cost) / 5)
-        bin_maxs = [(min_cost + (i * interval)) for i in range(1,6)]
+        interval = round((max_cost - min_cost) / 3)
+        bin_maxs = [(min_cost + (i * interval)) for i in range(1,4)]
         temp_df['cost_bin'] = None
 
         for j, row in temp_df.iterrows():
             row_cost = row['total_price']
             row_bin = row['cost_bin']
             if not row_bin:
-                for i in range(5):
+                for i in range(3):
                     lo_idx = i - 1
                     hi_idx = i
                     if lo_idx < 0:
