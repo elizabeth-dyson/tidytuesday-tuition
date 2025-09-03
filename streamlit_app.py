@@ -48,8 +48,9 @@ def produce_plot1():
     )
     fig.update_xaxes(matches=None)
     fig.update_yaxes(matches=None)
-    fig.show()
 
     return fig
 
-produce_plot1()
+fig = produce_plot1()
+
+st.write(fig)
