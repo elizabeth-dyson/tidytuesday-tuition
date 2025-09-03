@@ -106,8 +106,6 @@ def produce_plot1(color_col: str, x_col: str, y_col: str):
 
 title = st.header("Tuition Cost & Salaries")
 
-st.set_page_config(layout="wide")
-
 add_color_checkbox = st.sidebar.selectbox(
     'Color By:', ('State', 'Degree Length', 'Region', 'Regional Division')
 )

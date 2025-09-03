@@ -121,8 +121,6 @@ def produce_plot2(chosen_year: int):
 
 title = st.header("Tuition Cost by Income Level")
 
-st.set_page_config(layout="wide")
-
 min_year, max_year = get_values()
 
 add_year_slider = st.sidebar.slider(
