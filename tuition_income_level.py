@@ -100,7 +100,7 @@ def get_plot_df(df2: pd.DataFrame, facet_col: str = None):
         max_cost = temp_df['total_price'].max()
         min_cost = temp_df['total_price'].min()
         interval = round((max_cost - min_cost) / 5)
-        bin_maxs = [min_cost + i * interval for i in range(1,6)]
+        bin_maxs = [(min_cost + (i * interval)) for i in range(1,6)]
         temp_df['cost_bin'] = None
 
         for i in range(4):
