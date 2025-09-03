@@ -48,9 +48,11 @@ def produce_plot1():
     )
     fig.update_xaxes(matches=None)
     fig.update_yaxes(matches=None)
+    fig.update_layout(height=600, margin=dict(l=20,r=20,t=40,b=20))
 
     return fig
 
 fig = produce_plot1()
 
-st.write(fig)
+st.set_page_config(layout="wide")
+st.plotly_chart(fig, use_container_width=True)
