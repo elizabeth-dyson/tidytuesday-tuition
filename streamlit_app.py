@@ -94,7 +94,7 @@ def produce_plot1(color_col: str, x_col: str, y_col: str):
 
     return fig
 
-title = st.header("Tuition Cost Impact on Mid-Career Salaries")
+title = st.header("Tuition Cost & Salaries")
 
 st.set_page_config(layout="wide")
 
