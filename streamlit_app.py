@@ -51,8 +51,18 @@ def set_regions_divisions(df1: pd.DataFrame):
         'Territories': ['American Samoa', 'Puerto Rico', 'Guam', 'Virgin Islands']
     }
 
-    df1['division'] = df1['state'].map(division_dict)
-    df1['region'] = df1['division'].map(region_dict)
+    inv_region_dict = {}
+    for key, lis in region_dict.items():
+        for div in lis:
+            inv_region_dict[div] = key
+
+    inv_division_dict = {}
+    for key, lis in division_dict.items():
+        for state in lis:
+            inv_division_dict[state] = key
+
+    df1['division'] = df1['state'].map(inv_division_dict)
+    df1['region'] = df1['division'].map(inv_region_dict)
 
     return df1
 
@@ -69,7 +79,7 @@ def produce_plot1(color_col: str, x_col: str, y_col: str):
 
     x_dict = {
         'In-State': 'in_state_tuition',
-        'Out-of-State': 'out_of_state_tution'
+        'Out-of-State': 'out_of_state_tuition'
     }
     y_dict = {
         'Mid-Career': 'mid_career_pay',
