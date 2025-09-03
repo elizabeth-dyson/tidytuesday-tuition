@@ -113,7 +113,7 @@ add_color_checkbox = st.sidebar.selectbox(
 )
 
 add_x_checkbox = st.sidebar.selectbox(
-    'Tuition Type:', ('In-State', 'Out-of-State')
+    'Tuition Type:', ('Out-of-State', 'In-State')
 )
 
 add_y_checkbox = st.sidebar.selectbox(
