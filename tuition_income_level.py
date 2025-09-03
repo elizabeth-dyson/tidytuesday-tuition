@@ -96,7 +96,7 @@ def get_plot_df(df2: pd.DataFrame, facet_col: str = None):
 
     temp_df = df2[(df2['percent_cost'] <= 100) & (df2['percent_cost'] >= 0)].copy()
 
-    if facet_col == 'total_cost':
+    if facet_col == 'cost_bin':
         max_cost = temp_df['total_price'].max()
         min_cost = temp_df['total_price'].min()
         interval = round((max_cost - min_cost) / 5)
@@ -117,8 +117,6 @@ def get_plot_df(df2: pd.DataFrame, facet_col: str = None):
                 if not row_bin:
                     if row_cost <= hi & row_cost > lo:
                         temp_df.loc[j, 'cost_bin'] = f'${lo}-${hi}'
-
-        facet_col = 'cost_bin'
 
     if facet_col:
         temp_df['median'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform('median')
@@ -150,7 +148,7 @@ def produce_plot2(chosen_year: int, facet_name: str):
         'None': None,
         'Region': 'region',
         'Type': 'type',
-        'Total Cost': 'total_cost'
+        'Total Cost': 'cost_bin'
     }
 
     facet_col = facet_dict[facet_name]
@@ -160,14 +158,14 @@ def produce_plot2(chosen_year: int, facet_name: str):
         fig = px.bar(
             plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
             labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level",
-                    "type": "Type", "total_cost": "Total Cost"},
+                    "type": "Type", "cost_bin": "Total Cost", "region": "Region"},
             facet_row=facet_col
         )
     else:
         fig = px.bar(
             plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
             labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level",
-                    "type": "Type", "total_cost": "Total Cost"}
+                    "type": "Type", "cost_bin": "Total Cost", "region": "Region"}
         )
 
     return fig
