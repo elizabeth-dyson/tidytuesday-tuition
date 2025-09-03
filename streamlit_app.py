@@ -54,5 +54,7 @@ def produce_plot1():
 
 fig = produce_plot1()
 
+st.write("Tuition Cost Impact on Mid-Career Salaries")
+
 st.set_page_config(layout="wide")
 st.plotly_chart(fig, use_container_width=True)
