@@ -91,35 +91,61 @@ def find_third_quartile(data):
     return data.quantile(0.75)
 
 
-def get_plot_df(df2: pd.DataFrame, facet_col: str):
+def get_plot_df(df2: pd.DataFrame, facet_col: str = None):
     df2['percent_cost'] = (df2['net_cost'] / df2['total_price'].mask(lambda x: x == 0)) * 100
 
     temp_df = df2[(df2['percent_cost'] <= 100) & (df2['percent_cost'] >= 0)].copy()
 
-    temp_df['median'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform('median')
-    temp_df['q1'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform(find_first_quartile)
-    temp_df['q3'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform(find_third_quartile)
+    if facet_col:
+        temp_df['median'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform('median')
+        temp_df['q1'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform(find_first_quartile)
+        temp_df['q3'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform(find_third_quartile)
+    else:
+        temp_df['median'] = temp_df.groupby('income_lvl')['percent_cost'].transform('median')
+        temp_df['q1'] = temp_df.groupby('income_lvl')['percent_cost'].transform(find_first_quartile)
+        temp_df['q3'] = temp_df.groupby('income_lvl')['percent_cost'].transform(find_third_quartile)
 
     temp_df['e_plus'] = temp_df['q3'] - temp_df['median']
     temp_df['e_minus'] = temp_df['median'] - temp_df['q1']
 
-    plot_df = temp_df[['income_lvl', facet_col, 'median', 'e_plus', 'e_minus']].drop_duplicates()
+    if facet_col:
+        plot_df = temp_df[['income_lvl', 'median', 'e_plus', 'e_minus', facet_col]].drop_duplicates()
+    else:
+        plot_df = temp_df[['income_lvl', 'median', 'e_plus', 'e_minus']].drop_duplicates()
+
     return plot_df
 
 
-def produce_plot2(chosen_year: int):
+def produce_plot2(chosen_year: int, facet_name: str):
     df2 = get_df2()
     df2 = set_regions_divisions(df2)
 
     df2_year = df2[df2['year'] == chosen_year].copy()
 
-    plot_df = get_plot_df(df2_year, 'campus')
+    facet_dict = {
+        'None': None,
+        'State': 'state',
+        'Type': 'type',
+        'Campus': 'campus',
+        'Total Cost': 'total_cost'
+    }
 
-    fig = px.bar(
-        plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
-        labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level"},
-        facet_row='campus'
-    )
+    facet_col = facet_dict[facet_name]
+    plot_df = get_plot_df(df2_year, facet_col)
+
+    if facet_col:
+        fig = px.bar(
+            plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
+            labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level", "state": "State",
+                    "type": "Type", "campus": "Campus", "total_cost": "Total Cost"},
+            facet_row=facet_col
+        )
+    else:
+        fig = px.bar(
+            plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
+            labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level", "state": "State",
+                    "type": "Type", "campus": "Campus", "total_cost": "Total Cost"}
+        )
 
     return fig
 
@@ -132,14 +158,14 @@ add_year_slider = st.sidebar.slider(
     'Select Year:', min_year, max_year
 )
 
-# add_x_checkbox = st.sidebar.selectbox(
-#     'Tuition Type:', ('Out-of-State', 'In-State')
-# )
+add_facet_selectbox = st.sidebar.selectbox(
+    'Group By:', ('None', 'State', 'Type', 'Campus', 'Total Cost')
+)
 
 # add_y_checkbox = st.sidebar.selectbox(
 #     'Salary Type:', ('Mid-Career', 'Early Career')
 # )
 
-fig2 = produce_plot2(add_year_slider)
+fig2 = produce_plot2(add_year_slider, add_facet_selectbox)
 
 chart2 = st.plotly_chart(fig2, use_container_width=True)
