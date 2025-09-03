@@ -29,6 +29,7 @@ def get_df2():
     tuition_income = load_data(data_types['ti'])
 
     tuition_cost = clean_state_name(tuition_cost)
+    tuition_income.loc[tuition_income['income_lvl'] == '48_001 to 75,000', 'income_lvl'] = '48,001 to 75,000'
 
     sub_cost = tuition_cost[['name', 'state', 'type']].copy()
     sub_income = tuition_income[['name', 'total_price', 'year', 'campus', 'net_cost', 'income_lvl']].copy()
@@ -103,18 +104,18 @@ def get_plot_df(df2: pd.DataFrame, facet_col: str = None):
         bin_maxs = [(min_cost + (i * interval)) for i in range(1,6)]
         temp_df['cost_bin'] = None
 
-        for i in range(4):
-            if i == 0:
-                lo = 0
-                hi = bin_maxs[0]
-            else:
-                lo = bin_maxs[i]
-                hi = bin_maxs[i+1]
-
-            for j, row in temp_df.iterrows():
-                row_cost = row['total_price']
-                row_bin = row['cost_bin']
-                if not row_bin:
+        for j, row in temp_df.iterrows():
+            row_cost = row['total_price']
+            row_bin = row['cost_bin']
+            if not row_bin:
+                for i in range(5):
+                    lo_idx = i - 1
+                    hi_idx = i
+                    if lo_idx < 0:
+                        lo = 0
+                    else:
+                        lo=bin_maxs[lo_idx]
+                    hi = bin_maxs[hi_idx]
                     if row_cost <= hi & row_cost > lo:
                         temp_df.loc[j, 'cost_bin'] = f'${lo}-${hi}'
 
