@@ -91,19 +91,19 @@ def find_third_quartile(data):
     return data.quantile(0.75)
 
 
-def get_plot_df(df2: pd.DataFrame):
+def get_plot_df(df2: pd.DataFrame, facet_col: str):
     df2['percent_cost'] = (df2['net_cost'] / df2['total_price'].mask(lambda x: x == 0)) * 100
 
     temp_df = df2[(df2['percent_cost'] <= 100) & (df2['percent_cost'] >= 0)].copy()
 
-    temp_df['median'] = temp_df.groupby('income_lvl')['percent_cost'].transform('median')
-    temp_df['q1'] = temp_df.groupby('income_lvl')['percent_cost'].transform(find_first_quartile)
-    temp_df['q3'] = temp_df.groupby('income_lvl')['percent_cost'].transform(find_third_quartile)
+    temp_df['median'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform('median')
+    temp_df['q1'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform(find_first_quartile)
+    temp_df['q3'] = temp_df.groupby([facet_col, 'income_lvl'])['percent_cost'].transform(find_third_quartile)
 
     temp_df['e_plus'] = temp_df['q3'] - temp_df['median']
     temp_df['e_minus'] = temp_df['median'] - temp_df['q1']
 
-    plot_df = temp_df[['income_lvl', 'median', 'e_plus', 'e_minus']].drop_duplicates()
+    plot_df = temp_df[['income_lvl', facet_col, 'median', 'e_plus', 'e_minus']].drop_duplicates()
     return plot_df
 
 
@@ -113,14 +113,18 @@ def produce_plot2(chosen_year: int):
 
     df2_year = df2[df2['year'] == chosen_year].copy()
 
-    plot_df = get_plot_df(df2_year)
+    plot_df = get_plot_df(df2_year, 'campus')
 
-    fig = px.bar(plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus')
+    fig = px.bar(
+        plot_df, x='income_lvl', y='median', error_y='e_plus', error_y_minus='e_minus',
+        labels={"median": "Percentage Paid of Total Cost", "income_lvl": "Income Level"},
+        facet_row='campus'
+    )
 
     return fig
 
 
-title = st.header("Tuition Cost by Income Level")
+title = st.header("Tuition Cost Percentages by Income Level")
 
 min_year, max_year = get_values()
 
