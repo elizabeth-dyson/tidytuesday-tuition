@@ -92,8 +92,9 @@ def find_third_quartile(data):
 
 
 def get_plot_df(df2: pd.DataFrame):
+    df2['percent_cost'] = (df2['net_cost'] / df2['total_price'].mask(lambda x: x == 0)) * 100
+
     temp_df = df2[(df2['percent_cost'] <= 100) & (df2['percent_cost'] >= 0)].copy()
-    temp_df['percent_cost'] = (temp_df['net_cost'] / temp_df['total_price'].mask(lambda x: x == 0)) * 100
 
     temp_df['median'] = temp_df.groupby('income_lvl')['percent_cost'].transform('median')
     temp_df['q1'] = temp_df.groupby('income_lvl')['percent_cost'].transform(find_first_quartile)
