@@ -106,7 +106,7 @@ def produce_plot(div_type: str):
     #     'Regional Division': 'division'
     # }
 
-    fig = px.bar(div_df, x='region', y='enrollment_percent', color='category')
+    fig = px.bar(div_df, x='region', y='avg_percent', color='category')
 
     return fig
 
