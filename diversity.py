@@ -44,7 +44,7 @@ def set_regions_divisions(df: pd.DataFrame):
     return df
 
 
-def get_dfs(div_type: str):
+def get_dfs(div_type: str, x_type: str):
     data_types = {'tc': 'tuition_cost', 'ti': 'tuition_income', 'sp': 'salary_potential', 'ht': 'historical_tuition', 'ds': 'diversity_school'}
 
     tuition_cost = load_data(data_types['tc'])
@@ -54,8 +54,6 @@ def get_dfs(div_type: str):
 
     df_sub = pd.merge(sub_cost, diversity_school, how='inner', on='name')
     df_sub = set_regions_divisions(df_sub)
-
-    df_sub['enrollment_percent'] = (df_sub['enrollment'] / df_sub['total_enrollment']) * 100
 
     if div_type == 'Gender':
         df = df_sub[df_sub['category'] == 'Women'].reset_index(drop=True)
@@ -82,31 +80,27 @@ def get_dfs(div_type: str):
         df = df_sub[(df_sub['category'] != 'Women') & (df_sub['category'] != 'Total Minority')].reset_index(drop=True)
 
     df['enrollment_percent'] = (df['enrollment'] / df['total_enrollment']) * 100
-    df['avg_percent'] = df.groupby(['region', 'category'])['enrollment_percent'].transform('mean')
-    stat_df = df[['category', 'region', 'avg_percent']].drop_duplicates().reset_index(drop=True)
+    df['avg_percent'] = df.groupby([x_type, 'category'])['enrollment_percent'].transform('mean')
+    stat_df = df[['category', x_type, 'avg_percent']].drop_duplicates().reset_index(drop=True)
 
     return stat_df
 
 
-def produce_plot(div_type: str):
-    div_df = get_dfs(div_type)
+def produce_plot(div_type: str, x_type: str):
+    x_dict = {
+        'Region': 'region',
+        'Regional Division': 'division',
+        'School Type': 'type',
+        'Degree Length': 'degree_length'
+    }
 
-    # x_dict = {
-    #     'In-State': 'in_state_tuition',
-    #     'Out-of-State': 'out_of_state_tuition'
-    # }
-    # y_dict = {
-    #     'Mid-Career': 'mid_career_pay',
-    #     'Early Career': 'early_career_pay'
-    # }
-    # color_dict = {
-    #     'State': 'state',
-    #     'Degree Length': 'degree_length',
-    #     'Region': 'region',
-    #     'Regional Division': 'division'
-    # }
+    div_df = get_dfs(div_type, x_dict[x_type])
 
-    fig = px.bar(div_df, x='region', y='avg_percent', color='category')
+    fig = px.bar(
+        div_df, x=x_dict[x_type], y='avg_percent', color='category',
+        labels={"avg_percent": "Average Percent", "region": "Region", "category": "Category",
+                "division": "Regional Division", "type": "School Type", "degree_length": "Degree Length"}
+    )
 
     return fig
 
@@ -116,18 +110,10 @@ choose_div_selectbox = st.sidebar.selectbox(
     'Diversity Type:', ('Gender', 'Race')
 )
 
-# add_color_checkbox = st.sidebar.selectbox(
-#     'Color By:', ('State', 'Degree Length', 'Region', 'Regional Division')
-# )
+add_x_selectbox = st.sidebar.selectbox(
+    'X-Axis:', ('Region', 'Regional Division', 'School Type', 'Degree Length')
+)
 
-# add_x_checkbox = st.sidebar.selectbox(
-#     'Tuition Type:', ('Out-of-State', 'In-State')
-# )
-
-# add_y_checkbox = st.sidebar.selectbox(
-#     'Salary Type:', ('Mid-Career', 'Early Career')
-# )
-
-fig = produce_plot(choose_div_selectbox)
+fig = produce_plot(choose_div_selectbox, add_x_selectbox)
 
 chart = st.plotly_chart(fig, use_container_width=True)
