@@ -54,14 +54,38 @@ def get_dfs(div_type: str):
 
     df_sub = pd.merge(sub_cost, diversity_school, how='inner', on='name')
     df_sub = set_regions_divisions(df_sub)
+
     df_sub['enrollment_percent'] = (df_sub['enrollment'] / df_sub['total_enrollment']) * 100
 
     if div_type == 'Gender':
         df = df_sub[df_sub['category'] == 'Women'].reset_index(drop=True)
-    else:
-        df = df_sub[df_sub['category'] != 'Women'].reset_index(drop=True)
 
-    return df
+        men_rows = []
+        for _, row in df.iterrows():
+            men_enrollment = row['total_enrollment'] - row['enrollment']
+            temp_df = pd.DataFrame({
+                'name': row['name'],
+                'total_enrollment': row['total_enrollment'],
+                'state': row['state'],
+                'category': ['Men'],
+                'enrollment': [men_enrollment],
+                'type': row['type'],
+                'degree_length': row['degree_length'],
+                'division': row['division'],
+                'region': row['region']
+            })
+            men_rows.append(temp_df)
+
+        df = pd.concat([df] + men_rows, ignore_index=True).sort_values(by='name').reset_index(drop=True)
+
+    else:
+        df = df_sub[(df_sub['category'] != 'Women') & (df_sub['category'] != 'Total Minority')].reset_index(drop=True)
+
+    df['enrollment_percent'] = (df['enrollment'] / df['total_enrollment']) * 100
+    df['avg_percent'] = df.groupby(['region', 'category'])['enrollment_percent'].transform('mean')
+    stat_df = df[['category', 'region', 'avg_percent']].drop_duplicates().reset_index(drop=True)
+
+    return stat_df
 
 
 def produce_plot(div_type: str):
