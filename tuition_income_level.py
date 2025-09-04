@@ -141,7 +141,7 @@ add_year_slider = st.sidebar.slider(
 )
 
 add_split_selectbox = st.sidebar.selectbox(
-    'Group By:', ('Type', 'Region')
+    'Group By:', ('Type', 'Region', 'Total Cost')
 )
 
 # add_y_checkbox = st.sidebar.selectbox(
