@@ -115,6 +115,17 @@ def get_plot_df(df2: pd.DataFrame, split_col: str):
     temp_df['median'] = temp_df.groupby([split_col, 'income_lvl'])['percent_cost'].transform('median')
 
     plot_df = temp_df[['income_lvl', 'median', split_col]].drop_duplicates()
+
+    order_dict = {
+        '0 to 30,000': 0,
+        '30,001 to 48,000': 1,
+        '48,001 to 75,000': 2,
+        '75,001 to 110,000': 3,
+        'Over 110,000': 4
+    }
+
+    plot_df['x_order'] = plot_df['income_lvl'].map(order_dict)
+    plot_df = plot_df.sort_values(by=[split_col, 'x_order'])
     
     return plot_df
 
