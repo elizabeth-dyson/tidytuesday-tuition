@@ -46,7 +46,7 @@ def set_regions_divisions(df1: pd.DataFrame):
         'South Atlantic': ['Delaware', 'District of Columbia', 'Florida', 'Georgia', 'Maryland', 'North Carolina', 'South Carolina', 'Virginia', 'West Virginia'],
         'East South Central': ['Alabama', 'Kentucky', 'Mississippi', 'Tennessee'],
         'West South Central': ['Arkansas', 'Louisiana', 'Oklahoma', 'Texas'],
-        'Moutain': ['Arizona', 'Colorado', 'Idaho', 'Montana', 'Nevada', 'New Mexico', 'Utah', 'Wyoming'],
+        'Mountain': ['Arizona', 'Colorado', 'Idaho', 'Montana', 'Nevada', 'New Mexico', 'Utah', 'Wyoming'],
         'Pacific': ['Alaska', 'California', 'Hawaii', 'Oregon', 'Washington'],
         'Territories': ['American Samoa', 'Puerto Rico', 'Guam', 'Virgin Islands']
     }
