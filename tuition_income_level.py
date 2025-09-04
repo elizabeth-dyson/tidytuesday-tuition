@@ -90,27 +90,7 @@ def get_plot_df(df2: pd.DataFrame, split_col: str):
 
     temp_df = df2[(df2['percent_cost'] <= 100) & (df2['percent_cost'] >= 0)].copy()
 
-    # if facet_col == 'cost_bin':
-    #     max_cost = temp_df['total_price'].max()
-    #     min_cost = temp_df['total_price'].min()
-    #     interval = round((max_cost - min_cost) / 3)
-    #     bin_maxs = [(min_cost + (i * interval)) for i in range(1,4)]
-    #     temp_df['cost_bin'] = None
-
-    #     for j, row in temp_df.iterrows():
-    #         row_cost = row['total_price']
-    #         row_bin = row['cost_bin']
-    #         if not row_bin:
-    #             for i in range(3):
-    #                 lo_idx = i - 1
-    #                 hi_idx = i
-    #                 if lo_idx < 0:
-    #                     lo = 0
-    #                 else:
-    #                     lo=bin_maxs[lo_idx]
-    #                 hi = bin_maxs[hi_idx]
-    #                 if row_cost <= hi & row_cost > lo:
-    #                     temp_df.loc[j, 'cost_bin'] = f'${lo}-${hi}'
+    temp_df['cost_bin'] = pd.qcut(temp_df['total_price'], q=5)
 
     temp_df['median'] = temp_df.groupby([split_col, 'income_lvl'])['percent_cost'].transform('median')
 
@@ -138,8 +118,8 @@ def produce_plot2(chosen_year: int, split_name: str):
 
     split_dict = {
         'Region': 'region',
-        'Type': 'type'
-        # 'Total Cost': 'cost_bin'
+        'Type': 'type',
+        'Total Cost': 'cost_bin'
     }
 
     split_col = split_dict[split_name]
