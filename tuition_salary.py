@@ -104,6 +104,7 @@ def produce_plot1(color_col: str, x_col: str, y_col: str):
 
     return fig
 
+
 title = st.header("Tuition Cost & Salaries")
 
 add_color_checkbox = st.sidebar.selectbox(
@@ -121,4 +122,3 @@ add_y_checkbox = st.sidebar.selectbox(
 fig1 = produce_plot1(add_color_checkbox, add_x_checkbox, add_y_checkbox)
 
 chart1 = st.plotly_chart(fig1, use_container_width=True)
-
