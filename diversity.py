@@ -107,7 +107,7 @@ def produce_plot(div_type: str, x_type: str):
 title = st.header("Diversity Statistics")
 
 choose_div_selectbox = st.sidebar.selectbox(
-    'Diversity Type:', ('Gender', 'Race')
+    'Diversity Type:', ('Race', 'Gender')
 )
 
 add_x_selectbox = st.sidebar.selectbox(
