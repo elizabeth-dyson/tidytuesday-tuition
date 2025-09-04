@@ -129,9 +129,10 @@ def produce_plot(type_list: np.array, length_list: np.array, data_choice: str):
 
     fig = px.choropleth(locations=df['state_code'], locationmode="USA-states", color=df['avg_choice'], scope="usa", labels={"color": data_choice})
     fig.update_geos(
-        fitbounds="locations",
-        projection_scale=1.1,
-        center=dict(lat=37.8, lon=-96)
+        scope="usa",
+        projection=dict(type="albers usa"),
+        showcoastlines=False,
+        showcountries=False
     )
 
     return fig
